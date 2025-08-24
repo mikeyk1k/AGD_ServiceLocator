@@ -1,0 +1,34 @@
+﻿using System.Collections;
+using UnityEngine;
+
+public class GenericMonoSingleton<T> : MonoBehaviour where T : GenericMonoSingleton<T>
+{
+    private static T instance;
+    public static T Instance
+    {
+        get
+        {
+            if (instance == null)
+                instance = FindObjectOfType<T>();
+            if (instance == null)
+            {
+                GameObject singletonObject = new GameObject(typeof(T).Name);
+                instance = singletonObject.AddComponent<T>();
+            }
+            return instance;
+        }
+    }
+    private void Awake()
+    {
+        if(instance == null)
+        {
+            instance = this as T;
+            //DontDestroyOnLoad(gameObject);
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+            Debug.LogError($"An instance of {typeof(T).Name} already exists. Destroying duplicate instance.");
+        }
+    }
+}
